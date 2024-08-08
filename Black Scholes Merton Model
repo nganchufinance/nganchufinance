@@ -1,0 +1,27 @@
+# Implied volatility 
+
+from scipy.stats import norm
+from scipy.optimize import brentq
+import numpy as np
+
+# Given values
+S = 15  # Stock price
+K = 13  # Strike price
+T = 0.25  # Time to maturity in years
+r = 0.05  # Risk-free rate
+C_market = 2.5  # Market price of the call option
+
+# Black-Scholes formula for a call option
+def black_scholes_call_price(S, K, T, r, sigma):
+    d1 = (np.log(S / K) + (r + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    d2 = d1 - sigma * np.sqrt(T)
+    return S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+
+# Function to find the difference between the market price and Black-Scholes price
+def objective_function(sigma):
+    return black_scholes_call_price(S, K, T, r, sigma) - C_market
+
+# Use a numerical method (Brent's method) to solve for sigma
+implied_volatility = brentq(objective_function, 0.01, 1.0)  # Bounds for volatility [0.01, 1.0]
+
+implied_volatility
